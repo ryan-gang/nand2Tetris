@@ -16,5 +16,7 @@ CHIP Mux4Way16 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Mux16(a=a, b=b, sel=sel[0], out=muxab); // Based on LSB, it can be either A or B
+    Mux16(a=c, b=d, sel=sel[0], out=muxcd); // Similarly, this can be either C or D
+    Mux16(a=muxab, b=muxcd, sel=sel[1], out=out); // Based on MSB, choose the actual correct bus
 }
