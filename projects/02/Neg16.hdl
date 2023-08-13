@@ -1,0 +1,14 @@
+// File name: projects/02/Neg16.hdl
+
+/**
+ * 16-bit chip to detect whether its negative or positive:
+ * if in < 0 : out = 1, else out = 0
+ */
+
+CHIP Neg16 {
+    IN in[16];
+    OUT;
+
+    PARTS:
+    And(a=in[15], b=true, out=out);
+}
