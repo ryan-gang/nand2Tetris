@@ -7,7 +7,7 @@
 
 CHIP Neg16 {
     IN in[16];
-    OUT;
+    OUT out;
 
     PARTS:
     And(a=in[15], b=true, out=out);
