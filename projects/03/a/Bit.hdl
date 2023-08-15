@@ -14,5 +14,6 @@ CHIP Bit {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    Mux(a = outt-1, b = in, sel = load, out = muxOut);
+    DFF(in = muxOut, out = outt-1, out=out); // Output pin can be mapped to multiple inner pins.
 }
