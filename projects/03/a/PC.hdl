@@ -12,9 +12,16 @@
  */
 
 CHIP PC {
-    IN in[16],load,inc,reset;
+    IN in[16], load, inc, reset;
     OUT out[16];
-
+    
     PARTS:
-    // Put your code here:
+    Inc16(in=outprev, out=outt1);
+	Mux16(a=false, b=outt1, sel=inc, out=outt2);
+	Mux16(a=outt2, b=in, sel=load, out=outt3);
+	Mux16(a=outt3, b=false, sel=reset, out=outt4);
+    Or(a=load, b=inc, out=action);
+    Or(a=action, b=reset, out=pcaction);
+    Register(in=outt4, load=pcaction, out=outprev); // If we rely on load here, value wont be updated.
+    Or16(a=outprev, b=outprev, out=out);
 }
