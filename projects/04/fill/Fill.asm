@@ -23,29 +23,47 @@ D;JEQ
 (BLACK)
     @SCREEN
     D=A
+    @STOREDVALUE
+    M=D
     (LOOPB)
-        A=D
+        @STOREDVALUE
+        A=M
         M=-1
         A=A+1
         D=A
+        @STOREDVALUE
+        M=D
+        @24543 // Last pixel
+        D=D-A
         @LOOPB
-        0;JMP
+        D;JLT
+        @FINISH
+        D;JEQ
     (END)
 (ENDBLACK)
 
 (LIGHT)
     @SCREEN
     D=A
+    @STOREDVALUE
+    M=D
     (LOOPL)
-        A=D
+        @STOREDVALUE
+        A=M
         M=0
         A=A+1
         D=A
+        @STOREDVALUE
+        M=D
+        @24543 // Last pixel
+        D=D-A
         @LOOPL
-        0;JMP
+        D;JLT
+        @FINISH
+        D;JEQ
     (END)
 (ENDLIGHT)
 
+(FINISH)
 @START
 0;JMP
-(FINISH)
