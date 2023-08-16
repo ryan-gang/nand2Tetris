@@ -9,4 +9,32 @@
 // This program only needs to handle arguments that satisfy
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
-// Put your code here.
+// Python equivalent.
+// def product(R0, R1):
+//     R2 = 0
+//     while (R0 > 0):
+//         R2 += R1
+//         R0 -= 1
+//     return R2
+
+@R2
+M=0 // Initialize R2 to 0.
+@R0 
+D=M // First check if R0 > 0 or not
+@END
+D;JLE // If R0 <= 0 goto (END)
+(LOOP)
+@R2
+D=M // D=R2
+@R1
+D=D+M // D+=R1
+@R2
+M=D // R2=D
+@R0
+M=M-1 // R0-=1
+D=M
+@END
+D;JLE // If R0<=0 goto (END)
+@LOOP
+0;JMP // Else goto (LOOP)
+(END)
