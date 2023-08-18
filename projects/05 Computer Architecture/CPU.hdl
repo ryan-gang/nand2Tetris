@@ -39,5 +39,53 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // Instruction Decoding.
+    // C-instruction : i xx a cccccc d1d2d3 j1j2j3
+    // A-instruction : i bbbbbbbbbbbbbbb
+    // i-bit codes instruction type, 1 : C and 0 : A
+    Not(in=instruction[15], out=Ainstruction);
+    Not(in=Ainstruction, out=Cinstruction);
+
+    // Instruction Execution.
+    // a-bit : whether the ALU will operate on the A register input or on the Memory input
+    // c-bits : which function the ALU will compute
+    // d-bits : enable various locations to accept the ALU result
+    // d1 => A, d2 => D, d2 => M (Fig 4.4)
+    And(a=Cinstruction, b=instruction[5], out=ALUtoA);
+    And(a=Cinstruction, b=instruction[4], out=loadD);
+    And(a=Cinstruction, b=instruction[3], out=writeM);
+
+    Mux16(a=instruction, b=ALUout, sel=ALUtoA, out=Ain);
+
+    // If A-instruction or C-instruction with destination to A, we load A
+    Or(a=Ainstruction, b=ALUtoA, out=loadA);
+    ARegister(in=Ain, load=loadA, out=Aout);
+    // Select A or M based on a-bit
+    Mux16(a=Aout, b=inM, sel=instruction[12], out=AMout);    
+    // Load D from ALU
+    DRegister(in=ALUout, load=loadD, out=Dout);
+
+    ALU(x=Dout, y=AMout, zx=instruction[11], nx=instruction[10], 
+        zy=instruction[9], ny=instruction[8], f=instruction[7],
+        no=instruction[6], out=ALUout, zr=ZRout, ng=NGout);
+
+    // Set outputs for writing memory
+    Or16(a=false, b=Aout, out[0..14]=addressM);
+    Or16(a=false, b=ALUout, out=outM);
+
+    // Next instruction fetching.  
+    // j1 : out < 0
+    // j2 : out = 0
+    // j3 : out > 0 (Fig 4.5)
+    And(a=ZRout, b=instruction[1], out=jeq);    // is zero and jump if zero
+    And(a=NGout, b=instruction[2], out=jlt);    // is neg and jump if neg
+    Or(a=ZRout, b=NGout, out=zeroOrNeg);
+    Not(in=zeroOrNeg, out=positive);            // is positive (not zero and not neg)
+    And(a=positive, b=instruction[0], out=jgt); // is pos and jump if pos
+    Or(a=jeq, b=jlt, out=jle);
+    Or(a=jle, b=jgt, out=jumpToA);              // load PC if cond met and jump if cond
+    And(a=Cinstruction, b=jumpToA, out=PCload); // Only jump if C instruction
+    Not(in=PCload, out=PCinc);                  // only inc if not load
+    PC(in=Aout, inc=PCinc, load=PCload, reset=reset, out[0..14]=pc);
+
 }
